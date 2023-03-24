@@ -1,0 +1,16 @@
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: my-service-2
+  title: My service 2
+  description: This service provides so and so apis
+  annotations:
+    backstage.io/managed-by-location: https://backstage-work-poc.s3.ap-south-1.amazonaws.com/my-service-2.catalog-info.yml
+
+  tags: []
+  links: []
+spec:
+  type: service
+  lifecycle: production
+  owner: guest

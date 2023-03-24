@@ -1,0 +1,73 @@
+# Notice the v1beta3 version
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+# some metadata about the template itself
+metadata:
+  name: v1beta3-demo
+  title: Create New Service
+  description: scaffolder v1beta3 template demo
+spec:
+  owner: backstage/techdocs-core
+  type: service
+
+  # these are the steps which are rendered in the frontend with the form input
+  parameters:
+    - title: Fill in some steps
+      required:
+        - owner
+        - reponame
+      properties:
+        owner:
+          title: Owner Name (Github Owner)
+          type: string
+          description: Github username
+          ui:autofocus: true
+          ui:options:
+            rows: 5
+        reponame:
+          title: Repository Name
+          type: string
+          description: A new repository with this name will be created
+          # ui:field: OwnerPicker
+          # ui:options:
+          # catalogFilter:
+          # kind: Group
+
+  # here's the steps that are executed in series in the scaffolder backend
+  steps:
+    - id: devpodmain:create-github-repo
+      name: Create GitHub Repository
+      action: devpodmain:create-github-repo
+      # input:
+      #   values:
+      #     owner: ${{ parameters.owner }}
+      #     reponame: ${{ parameters.reponame }}
+
+    - id: devpodmain:harness-ci
+      name: Create Harness CI pipeline
+      action: devpodmain:harness-ci
+      # input:
+
+    - id: devpodmain:create-jfrog-repo
+      name: Create JFrog Repository
+      action: devpodmain:create-jfrog-repo
+      # input:
+
+    - id: devpodmain:harness-cd
+      name: Create Harness CD pipeline
+      action: devpodmain:harness-cd
+      # input:
+
+    - id: devpodmain:deploy-to-cluster
+      name: Deploy to cluster
+      action: devpodmain:deploy-to-cluster
+      # input:
+
+  # some outputs which are saved along with the job for use in the frontend
+  output:
+    links: []
+    #   - title: Repository
+    #     url: ${{ steps['publish'].output.remoteUrl }}
+    #   - title: Open in catalog
+    #     icon: catalog
+    #     entityRef: ${{ steps['register'].output.entityRef }}
