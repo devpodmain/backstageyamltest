@@ -29,14 +29,7 @@ spec:
           description: Developer or team who is responsible for this service
           ui:autofocus: true
           ui:options:
-            rows: 5
-        domain:
-          title: Domain
-          type: string
-          description: Domain this service is part of
-          ui:autofocus: true
-          ui:options:
-            rows: 5
+            rows: 5        
         language:
           title: Language
           type: string
