@@ -7,7 +7,6 @@ metadata:
 spec:
   owner: guest
   type: service
-
   # these are the steps which are rendered in the frontend with the form input
   parameters:
     - title: Please enter service details
@@ -44,7 +43,6 @@ spec:
           ui:autofocus: true
           ui:options:
             rows: 5
-
     - title: Fill in some steps for GitHub repo creation
       required:
         - githubOwner
@@ -66,7 +64,6 @@ spec:
           title: Github Host
           type: string
           description: What is your github host
-
   # here's the steps that are executed in series in the scaffolder backend
   steps:
     - id: devpodmain:create-github-repo
@@ -77,22 +74,18 @@ spec:
           owner: ${{ parameters.githubOwner }}
           reponame: ${{ parameters.reponame }}
           hostname: ${{ parameters.hostname }}
-
     - id: devpodmain:harness-ci
       name: Create Harness CI pipeline
       action: devpodmain:harness-ci
       # input:
-
     - id: devpodmain:create-jfrog-repo
       name: Create JFrog Repository
       action: devpodmain:create-jfrog-repo
       # input:
-
     - id: devpodmain:harness-cd
       name: Create Harness CD pipeline
       action: devpodmain:harness-cd
       # input:
-
     - id: devpodmain:deploy-to-cluster
       name: Deploy to cluster
       action: devpodmain:deploy-to-cluster
