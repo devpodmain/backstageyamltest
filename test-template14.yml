@@ -1,0 +1,98 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: v1beta3-demo
+  title: Create New Service From Scratch
+  description: Bootstrap a new service with GitHub, JFrog, And Harness
+spec:
+  owner: guest
+  type: service
+  # these are the steps which are rendered in the frontend with the form input
+  parameters:
+    - title: Please enter service details
+      required:
+        - serviceName
+        - owner
+        - description
+      properties:
+        serviceName:
+          title: Service name
+          type: string
+          description: A new service will be created with this name
+          ui:autofocus: true
+          ui:options:
+            rows: 5
+        owner:
+          title: Owner of the service
+          type: string
+          description: Developer or team who is responsible for this service
+          ui:autofocus: true
+          ui:options:
+            rows: 5        
+        language:
+          title: Language
+          type: string
+          description: Main language of this service codebase
+          ui:autofocus: true
+          ui:options:
+            rows: 5
+        description:
+          title: Description
+          type: string
+          description: Brief description of this service
+          ui:autofocus: true
+          ui:options:
+            rows: 5
+    - title: Fill in some steps for GitHub repo creation
+      required:
+        - githubOwner
+        - reponame
+        - hostname
+      properties:
+        githubOwner:
+          title: Owner Name (Github Owner)
+          type: string
+          description: Github username
+          ui:autofocus: true
+          ui:options:
+            rows: 5
+        reponame:
+          title: Repository Name
+          type: string
+          description: A new repository with this name will be created
+        hostname:
+          title: Github Host
+          type: string
+          description: What is your github host
+  # here's the steps that are executed in series in the scaffolder backend
+  steps:
+    - id: devpodmain:create-github-repo
+      name: Create GitHub Repository
+      action: devpodmain:create-github-repo
+      input:
+        values:
+          owner: ${{ parameters.githubOwner }}
+          reponame: ${{ parameters.reponame }}
+          hostname: ${{ parameters.hostname }}
+    - id: devpodmain:harness-ci
+      name: Create Harness CI pipeline
+      action: devpodmain:harness-ci
+      # input:
+    - id: devpodmain:create-jfrog-repo
+      name: Create JFrog Repository
+      action: devpodmain:create-jfrog-repo
+      # input:
+    - id: devpodmain:harness-cd
+      name: Create Harness CD pipeline
+      action: devpodmain:harness-cd
+      # input:
+    - id: devpodmain:deploy-to-cluster
+      name: Deploy to cluster
+      action: devpodmain:deploy-to-cluster
+      # input:
+
+  # some outputs which are saved along with the job for use in the frontend
+  output:
+    links:
+      - title: Repository Link
+        url: ${{ steps['devpodmain:create-github-repo'].output.githubRepoLink }}

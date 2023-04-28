@@ -7,18 +7,38 @@ metadata:
 spec:
   owner: guest
   type: service
+
   # these are the steps which are rendered in the frontend with the form input
   parameters:
     - title: Please enter service details
       required:
+        - serviceType
         - serviceName
         - owner
         - description
+        - language
       properties:
+        serviceType:
+          title: Service Type
+          type: string
+          enum:
+            - Create From Service 
+            - Import The Service 
+          description: Repository will be created or existing repository will be updated
+          ui:autofocus: true
+          ui:options:
+            rows: 5
         serviceName:
           title: Service name
           type: string
           description: A new service will be created with this name
+          ui:autofocus: true
+          ui:options:
+            rows: 5
+        tenantID:  
+          title: Tenant ID
+          type: string
+          description: Please enter the tenant ID
           ui:autofocus: true
           ui:options:
             rows: 5
@@ -28,10 +48,14 @@ spec:
           description: Developer or team who is responsible for this service
           ui:autofocus: true
           ui:options:
-            rows: 5        
+            rows: 5
         language:
           title: Language
           type: string
+          enum:
+            - Java
+            - Go
+            - Python
           description: Main language of this service codebase
           ui:autofocus: true
           ui:options:
@@ -43,6 +67,7 @@ spec:
           ui:autofocus: true
           ui:options:
             rows: 5
+
     - title: Fill in some steps for GitHub repo creation
       required:
         - githubOwner
@@ -63,36 +88,57 @@ spec:
         hostname:
           title: Github Host
           type: string
+          enum: 
+            - github.com
           description: What is your github host
+
   # here's the steps that are executed in series in the scaffolder backend
   steps:
     - id: devpodmain:create-github-repo
-      name: Create GitHub Repository
+      name: Create/Update GitHub Repository
       action: devpodmain:create-github-repo
       input:
         values:
           owner: ${{ parameters.githubOwner }}
           reponame: ${{ parameters.reponame }}
           hostname: ${{ parameters.hostname }}
+          language: ${{ parameters.language }}                   
+          serviceType : ${{ parameters.serviceType }}
+          tenantID : ${{ parameters.tenantID }}
+          description : ${{ parameters.description }}
+          
     - id: devpodmain:harness-ci
-      name: Create Harness CI pipeline
+      name: Create Harness CI Pipeline
       action: devpodmain:harness-ci
       # input:
+
     - id: devpodmain:create-jfrog-repo
       name: Create JFrog Repository
       action: devpodmain:create-jfrog-repo
       # input:
+
     - id: devpodmain:harness-cd
-      name: Create Harness CD pipeline
+      name: Create Harness CD Pipeline
       action: devpodmain:harness-cd
       # input:
+
     - id: devpodmain:deploy-to-cluster
       name: Deploy to cluster
       action: devpodmain:deploy-to-cluster
       # input:
+
+    - id: register
+      name: Register
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps['devpodmain:create-github-repo'].output.catalogFileLink }}
+        catalogInfoPath: '/catalog-info.yaml'
 
   # some outputs which are saved along with the job for use in the frontend
   output:
     links:
       - title: Repository Link
         url: ${{ steps['devpodmain:create-github-repo'].output.githubRepoLink }}
+      - title: Open in catalog 
+        icon: catalog
+        entityRef: ${{ steps['register'].output.entityRef }}
